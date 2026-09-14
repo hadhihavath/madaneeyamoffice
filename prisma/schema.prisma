@@ -1,0 +1,297 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Organization {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  logoUrl     String       @default("/brand/logo_en.png")
+  settings    String?      // JSON string for configuration
+  offices     Office[]
+  departments Department[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Office {
+  id               String            @id @default(cuid())
+  organizationId   String
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name             String
+  code             String            @unique
+  address          String
+  city             String
+  state            String            @default("Kerala")
+  country          String            @default("India")
+  latitude         Float
+  longitude        Float
+  attendanceRadius Int               @default(100) // in meters
+  status           String            @default("ACTIVE") // ACTIVE, INACTIVE
+  managerId        String?
+  phone            String?
+  email            String?
+  employees        Employee[]
+  attendances      Attendance[]
+  leaveRequests    LeaveRequest[]
+  tasks            Task[]
+  announcements    Announcement[]
+  calendarEvents   CalendarEvent[]
+  documents        Document[]
+  conversations    Conversation[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model Department {
+  id             String          @id @default(cuid())
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  code           String          @unique
+  description    String?
+  managerId      String?
+  employees      Employee[]
+  tasks          Task[]
+  announcements  Announcement[]
+  calendarEvents CalendarEvent[]
+  conversations  Conversation[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model User {
+  id                 String               @id @default(cuid())
+  email              String               @unique
+  passwordHash       String
+  role               String               @default("EMPLOYEE") // SUPER_ADMIN, ADMIN, HR, OFFICE_MANAGER, DEPARTMENT_MANAGER, EMPLOYEE
+  status             String               @default("ACTIVE") // ACTIVE, INACTIVE, SUSPENDED
+  employee           Employee?
+  createdTasks       Task[]               @relation("TaskCreator")
+  authoredAnnounces  Announcement[]       @relation("AnnounceAuthor")
+  conversationMember ConversationMember[]
+  sentMessages       Message[]
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model Employee {
+  id               String         @id @default(cuid())
+  userId           String         @unique
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeId       String         @unique // e.g. CEEM-001
+  firstName        String
+  lastName         String
+  email            String
+  phone            String
+  avatarUrl        String?
+  designation      String
+  officeId         String
+  office           Office         @relation(fields: [officeId], references: [id])
+  departmentId     String
+  department       Department     @relation(fields: [departmentId], references: [id])
+  managerId        String?
+  joiningDate      DateTime       @default(now())
+  emergencyContact String?
+  address          String?
+  employmentStatus String         @default("ACTIVE") // ACTIVE, INACTIVE, ONBOARDING, SUSPENDED
+  attendances      Attendance[]
+  leaveRequests    LeaveRequest[]
+  assignedTasks    Task[]         @relation("TaskAssignee")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model Attendance {
+  id                  String    @id @default(cuid())
+  employeeId          String
+  employee            Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  officeId            String
+  office              Office    @relation(fields: [officeId], references: [id])
+  date                String    // Format YYYY-MM-DD
+  checkInTime         DateTime?
+  checkOutTime        DateTime?
+  checkInLat          Float?
+  checkInLon          Float?
+  checkOutLat         Float?
+  checkOutLon         Float?
+  distanceMeters      Float?
+  locationAccuracy    Float?
+  status              String    @default("PRESENT") // PRESENT, ABSENT, LEAVE, LATE, HALF_DAY, REMOTE, HOLIDAY, SUSPICIOUS
+  isSuspicious        Boolean   @default(false)
+  suspiciousReason    String?
+  workDurationMinutes Int?      @default(0)
+  deviceInfo          String?
+  ipAddress           String?
+  notes               String?
+  modifiedByAdmin     Boolean   @default(false)
+  modifiedByUserId    String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@unique([employeeId, date])
+}
+
+model LeaveRequest {
+  id           String    @id @default(cuid())
+  employeeId   String
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  officeId     String
+  office       Office    @relation(fields: [officeId], references: [id])
+  leaveType    String    @default("CASUAL") // ANNUAL, SICK, CASUAL, MATERNITY, PATERNITY, UNPAID
+  startDate    String    // YYYY-MM-DD
+  endDate      String    // YYYY-MM-DD
+  totalDays    Int       @default(1)
+  reason       String
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  approvedById String?
+  decisionNote String?
+  decisionDate DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Task {
+  id           String      @id @default(cuid())
+  title        String
+  description  String
+  assignedToId String?
+  assignedTo   Employee?   @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  createdById  String
+  createdBy    User        @relation("TaskCreator", fields: [createdById], references: [id])
+  officeId     String?
+  office       Office?     @relation(fields: [officeId], references: [id])
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  priority     String      @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status       String      @default("TODO") // TODO, IN_PROGRESS, REVIEW, COMPLETED, CANCELLED
+  dueDate      String?     // YYYY-MM-DD
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Announcement {
+  id             String      @id @default(cuid())
+  title          String
+  content        String
+  priority       String      @default("NORMAL") // NORMAL, IMPORTANT, URGENT
+  targetAudience String      @default("EVERYONE") // EVERYONE, SPECIFIC_OFFICE, SPECIFIC_DEPARTMENT
+  officeId       String?
+  office         Office?     @relation(fields: [officeId], references: [id])
+  departmentId   String?
+  department     Department? @relation(fields: [departmentId], references: [id])
+  authorId       String
+  author         User        @relation("AnnounceAuthor", fields: [authorId], references: [id])
+  isPinned       Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Conversation {
+  id                   String               @id @default(cuid())
+  type                 String               @default("CHANNEL") // CHANNEL, DIRECT
+  name                 String?              // e.g. #general, #kozhikode-office
+  description          String?
+  officeId             String?
+  office               Office?              @relation(fields: [officeId], references: [id])
+  departmentId         String?
+  department           Department?          @relation(fields: [departmentId], references: [id])
+  isOfficeChannel      Boolean              @default(false)
+  isDepartmentChannel  Boolean              @default(false)
+  members              ConversationMember[]
+  messages             Message[]
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+}
+
+model ConversationMember {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt       DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content        String
+  attachmentUrl  String?
+  attachmentType String?
+  reactions      String?      // JSON string of reactions: [{"emoji": "👍", "count": 1, "users": ["id"]}]
+  createdAt      DateTime     @default(now())
+}
+
+model CalendarEvent {
+  id           String      @id @default(cuid())
+  title        String
+  description  String?
+  eventType    String      @default("MEETING") // MEETING, TRAINING, HOLIDAY, OFFICE_EVENT, DEADLINE
+  startDate    String      // YYYY-MM-DD
+  endDate      String?     // YYYY-MM-DD
+  startTime    String?     // HH:mm
+  endTime      String?     // HH:mm
+  officeId     String?
+  office       Office?     @relation(fields: [officeId], references: [id])
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  location     String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Document {
+  id           String    @id @default(cuid())
+  title        String
+  category     String    @default("HR_POLICIES") // HR_POLICIES, EMPLOYEE_DOCUMENTS, OFFICE_DOCUMENTS, TRAINING_MATERIALS, COMPANY_FORMS, REPORTS
+  fileName     String
+  fileUrl      String
+  fileSize     String    @default("1.2 MB")
+  accessRole   String    @default("ALL") // ALL, HR, MANAGERS, ADMIN
+  officeId     String?
+  office       Office?   @relation(fields: [officeId], references: [id])
+  uploadedById String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  actorId      String
+  actor        User     @relation(fields: [actorId], references: [id])
+  actorName    String
+  actorEmail   String
+  action       String   // EMPLOYEE_TRANSFER, ATTENDANCE_OVERRIDE, LEAVE_APPROVED, LEAVE_REJECTED, OFFICE_CREATED, SETTING_UPDATED
+  resourceType String   // EMPLOYEE, ATTENDANCE, LEAVE, OFFICE, SETTINGS
+  resourceId   String?
+  details      String
+  previousValue String?
+  newValue     String?
+  ipAddress    String?  @default("127.0.0.1")
+  createdAt    DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("SYSTEM") // ATTENDANCE, LEAVE, TASK, ANNOUNCEMENT, CHAT, SYSTEM
+  isRead    Boolean  @default(false)
+  linkUrl   String?
+  createdAt DateTime @default(now())
+}
