@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/utils/supabase/middleware";
 
 const PUBLIC_FILE_EXTENSIONS = /\.(png|jpg|jpeg|gif|svg|webp|ico|css|js|woff|woff2|ttf|eot)$/i;
 
@@ -24,7 +23,7 @@ export async function middleware(request: NextRequest) {
     if (sessionToken) {
       return NextResponse.redirect(new URL("/", request.url));
     }
-    return await updateSession(request);
+    return NextResponse.next();
   }
 
   // 3. Allow public auth APIs
@@ -42,7 +41,7 @@ export async function middleware(request: NextRequest) {
         { status: 401 }
       );
     }
-    return await updateSession(request);
+    return NextResponse.next();
   }
 
   // 5. Protect all application pages
@@ -54,7 +53,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return await updateSession(request);
+  return NextResponse.next();
 }
 
 export const config = {
