@@ -4,6 +4,14 @@ import { signToken, AUTH_COOKIE } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
+    // Security check: strictly deny demo switching in production unless explicitly enabled
+    if (process.env.ENABLE_DEMO_MODE !== "true") {
+      return NextResponse.json(
+        { error: "Demo switching is disabled for security." },
+        { status: 403 }
+      );
+    }
+
     const { email } = await req.json();
 
     if (!email) {

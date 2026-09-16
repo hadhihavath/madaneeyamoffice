@@ -7,8 +7,8 @@ import { Lock, Mail, ArrowRight, Shield, CheckCircle2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("hadihavath921@gmail.com");
-  const [password, setPassword] = useState("Password123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -174,32 +174,34 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Admin Access Bar */}
-          <div className="mt-8 pt-6 border-t border-slate-100">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2 text-center">
-              1-Click Super Admin Access
-            </span>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo("hadihavath921@gmail.com")}
-              className="w-full p-2.5 text-left bg-purple-50/70 hover:bg-purple-100/80 hover:border-purple-300 border border-purple-200 rounded-xl transition-all flex items-center justify-between group shadow-xs"
-            >
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-purple-700" />
-                <div>
-                  <span className="text-xs font-bold text-slate-900 group-hover:text-purple-900 block">
-                    Hadi Havath
-                  </span>
-                  <span className="text-[10px] text-purple-700 font-semibold block">
-                    hadihavath921@gmail.com
-                  </span>
-                </div>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900">
-                Super Admin
+          {/* Quick Admin Access Bar (Only in explicit demo mode) */}
+          {process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true" && (
+            <div className="mt-8 pt-6 border-t border-slate-100">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2 text-center">
+                1-Click Super Admin Access (Demo Mode)
               </span>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() => handleQuickDemo("hadihavath921@gmail.com")}
+                className="w-full p-2.5 text-left bg-purple-50/70 hover:bg-purple-100/80 hover:border-purple-300 border border-purple-200 rounded-xl transition-all flex items-center justify-between group shadow-xs"
+              >
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-purple-700" />
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 group-hover:text-purple-900 block">
+                      Hadi Havath
+                    </span>
+                    <span className="text-[10px] text-purple-700 font-semibold block">
+                      hadihavath921@gmail.com
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900">
+                  Super Admin
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

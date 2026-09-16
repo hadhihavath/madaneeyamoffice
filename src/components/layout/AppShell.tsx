@@ -57,14 +57,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
-      {/* 1-Click Role Switcher Demo Bar */}
-      <DemoBar
-        currentEmail={user?.email}
-        onPersonaSwitched={() => {
-          fetchSession();
-          window.location.reload();
-        }}
-      />
+      {/* 1-Click Role Switcher Demo Bar (Only in explicit demo mode) */}
+      {process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true" && (
+        <DemoBar
+          currentEmail={user?.email}
+          onPersonaSwitched={() => {
+            fetchSession();
+            window.location.reload();
+          }}
+        />
+      )}
 
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Left Sidebar */}

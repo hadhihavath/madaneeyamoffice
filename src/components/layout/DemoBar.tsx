@@ -45,6 +45,10 @@ export function DemoBar({ currentEmail, onPersonaSwitched }: DemoBarProps) {
     }
   };
 
+  if (process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE !== "true") {
+    return null;
+  }
+
   return (
     <aside
       aria-label="Demo role switcher"
