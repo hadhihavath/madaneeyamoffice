@@ -43,7 +43,12 @@ export default function AttendancePage() {
 
   const fetchSessionAndInit = async () => {
     try {
-      const meRes = await fetch("/api/auth/me");
+      const [meRes, offRes, deptRes] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch("/api/offices"),
+        fetch("/api/departments"),
+      ]);
+
       if (meRes.ok) {
         const meData = await meRes.json();
         setSession(meData.user);
@@ -52,13 +57,11 @@ export default function AttendancePage() {
         }
       }
 
-      const offRes = await fetch("/api/offices");
       if (offRes.ok) {
         const offData = await offRes.json();
         setOffices(offData.offices || []);
       }
 
-      const deptRes = await fetch("/api/departments");
       if (deptRes.ok) {
         const deptData = await deptRes.json();
         setDepartments(deptData.departments || []);

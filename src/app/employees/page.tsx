@@ -53,13 +53,24 @@ export default function EmployeesPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const meRes = await fetch("/api/auth/me");
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (filterOffice && filterOffice !== "ALL") params.set("officeId", filterOffice);
+      if (filterDept && filterDept !== "ALL") params.set("departmentId", filterDept);
+      if (filterRole && filterRole !== "ALL") params.set("role", filterRole);
+
+      const [meRes, offRes, deptRes, empRes] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch("/api/offices"),
+        fetch("/api/departments"),
+        fetch(`/api/employees?${params.toString()}`),
+      ]);
+
       if (meRes.ok) {
         const meData = await meRes.json();
         setSession(meData.user);
       }
 
-      const offRes = await fetch("/api/offices");
       if (offRes.ok) {
         const offData = await offRes.json();
         setOffices(offData.offices || []);
@@ -69,7 +80,6 @@ export default function EmployeesPage() {
         }
       }
 
-      const deptRes = await fetch("/api/departments");
       if (deptRes.ok) {
         const deptData = await deptRes.json();
         setDepartments(deptData.departments || []);
@@ -78,13 +88,6 @@ export default function EmployeesPage() {
         }
       }
 
-      const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (filterOffice && filterOffice !== "ALL") params.set("officeId", filterOffice);
-      if (filterDept && filterDept !== "ALL") params.set("departmentId", filterDept);
-      if (filterRole && filterRole !== "ALL") params.set("role", filterRole);
-
-      const empRes = await fetch(`/api/employees?${params.toString()}`);
       if (empRes.ok) {
         const empData = await empRes.json();
         setEmployees(empData.employees || []);

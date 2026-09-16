@@ -37,25 +37,30 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     try {
-      // 1. Session
-      const meRes = await fetch("/api/auth/me");
+      // Parallelize all requests to eliminate waterfall delay
+      const [meRes, officeRes, annRes, taskRes, calRes] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch("/api/offices"),
+        fetch("/api/announcements"),
+        fetch("/api/tasks?scope=MY"),
+        fetch("/api/calendar"),
+      ]);
+
       if (meRes.ok) {
         const meData = await meRes.json();
         setSession(meData.user);
       }
 
-      // 2. Offices
-      const officeRes = await fetch("/api/offices");
       if (officeRes.ok) {
         const officeData = await officeRes.json();
-        setOffices(officeData.offices || []);
+        const officeList = officeData.offices || [];
+        setOffices(officeList);
 
-        // Compute aggregate stats across offices
-        const totalEmps = officeData.offices.reduce(
+        const totalEmps = officeList.reduce(
           (acc: number, o: any) => acc + (o.totalEmployees || 0),
           0
         );
-        const totalPres = officeData.offices.reduce(
+        const totalPres = officeList.reduce(
           (acc: number, o: any) => acc + (o.presentCount || 0),
           0
         );
@@ -63,26 +68,20 @@ export default function DashboardPage() {
           ...prev,
           totalEmployees: totalEmps || prev.totalEmployees,
           presentToday: totalPres || prev.presentToday,
-          activeOffices: officeData.offices.length,
+          activeOffices: officeList.length,
         }));
       }
 
-      // 3. Announcements
-      const annRes = await fetch("/api/announcements");
       if (annRes.ok) {
         const annData = await annRes.json();
         setAnnouncements(annData.announcements?.slice(0, 3) || []);
       }
 
-      // 4. Tasks
-      const taskRes = await fetch("/api/tasks?scope=MY");
       if (taskRes.ok) {
         const taskData = await taskRes.json();
         setTasks(taskData.tasks?.slice(0, 4) || []);
       }
 
-      // 5. Calendar
-      const calRes = await fetch("/api/calendar");
       if (calRes.ok) {
         const calData = await calRes.json();
         setEvents(calData.events?.slice(0, 3) || []);

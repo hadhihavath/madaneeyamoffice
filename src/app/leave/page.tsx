@@ -38,16 +38,19 @@ export default function LeavePage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const meRes = await fetch("/api/auth/me");
+      const params = new URLSearchParams();
+      if (filterStatus && filterStatus !== "ALL") params.set("status", filterStatus);
+
+      const [meRes, res] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch(`/api/leave?${params.toString()}`),
+      ]);
+
       if (meRes.ok) {
         const meData = await meRes.json();
         setSession(meData.user);
       }
 
-      const params = new URLSearchParams();
-      if (filterStatus && filterStatus !== "ALL") params.set("status", filterStatus);
-
-      const res = await fetch(`/api/leave?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setLeaveRequests(data.leaveRequests || []);

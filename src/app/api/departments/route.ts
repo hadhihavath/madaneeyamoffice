@@ -4,6 +4,11 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const departments = await prisma.department.findMany({
       include: {
         employees: {
@@ -28,7 +33,14 @@ export async function GET() {
       totalEmployees: d.employees.filter((e) => e.employmentStatus === "ACTIVE").length,
     }));
 
-    return NextResponse.json({ departments: enriched });
+    return NextResponse.json(
+      { departments: enriched },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=15, stale-while-revalidate=60",
+        },
+      }
+    );
   } catch (error) {
     console.error("Departments fetch error:", error);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });

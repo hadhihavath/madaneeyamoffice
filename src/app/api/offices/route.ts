@@ -5,6 +5,11 @@ import { logAuditEvent } from "@/lib/audit";
 
 export async function GET() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const todayStr = new Date().toISOString().split("T")[0];
 
     const offices = await prisma.office.findMany({
@@ -61,7 +66,14 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ offices: enrichedOffices });
+    return NextResponse.json(
+      { offices: enrichedOffices },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=15, stale-while-revalidate=60",
+        },
+      }
+    );
   } catch (error) {
     console.error("Offices fetch error:", error);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
