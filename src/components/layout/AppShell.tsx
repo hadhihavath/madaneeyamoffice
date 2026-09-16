@@ -6,13 +6,15 @@ import { DemoBar } from "./DemoBar";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { MobileNav } from "./MobileNav";
-import { X } from "lucide-react";
+import { X, ShieldAlert } from "lucide-react";
+import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const fetchSession = async () => {
     try {
@@ -20,6 +22,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+        // Automatically prompt users logging in with default password
+        if (data.user?.isDefaultPassword) {
+          setChangePasswordOpen(true);
+        }
       } else {
         router.push("/login");
       }
@@ -97,9 +103,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Default Password Notice Banner */}
+          {user?.isDefaultPassword && (
+            <div className="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 text-white text-xs px-4 py-2 flex flex-wrap items-center justify-between gap-2 shadow-sm z-20">
+              <div className="flex items-center gap-2 font-medium">
+                <ShieldAlert className="w-4 h-4 text-amber-200 flex-shrink-0" />
+                <span>
+                  <strong>Security Alert:</strong> You are using the default temporary password (Password123!). Please create a personal password.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setChangePasswordOpen(true)}
+                className="px-3 py-1 bg-white text-amber-900 rounded-lg text-xs font-bold hover:bg-amber-50 active:bg-amber-100 shadow-2xs transition-all"
+              >
+                Change Password Now
+              </button>
+            </div>
+          )}
+
           <Header
             user={user}
             onToggleMobileMenu={() => setMobileDrawerOpen(true)}
+            onOpenChangePassword={() => setChangePasswordOpen(true)}
           />
 
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
@@ -107,6 +133,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={changePasswordOpen}
+        onClose={() => setChangePasswordOpen(false)}
+        isMandatory={Boolean(user?.isDefaultPassword)}
+        onPasswordChanged={() => {
+          fetchSession();
+        }}
+      />
 
       {/* Mobile Bottom Navigation */}
       <MobileNav onOpenDrawer={() => setMobileDrawerOpen(true)} />

@@ -11,14 +11,16 @@ import {
   CheckCircle2,
   Calendar,
   AlertTriangle,
+  Key,
 } from "lucide-react";
 
 interface HeaderProps {
   user: any;
   onToggleMobileMenu?: () => void;
+  onOpenChangePassword?: () => void;
 }
 
-export function Header({ user, onToggleMobileMenu }: HeaderProps) {
+export function Header({ user, onToggleMobileMenu, onOpenChangePassword }: HeaderProps) {
   const [timeStr, setTimeStr] = useState("");
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -190,6 +192,19 @@ export function Header({ user, onToggleMobileMenu }: HeaderProps) {
             </div>
           )}
         </div>
+
+        {/* Change Password Button */}
+        {onOpenChangePassword && (
+          <button
+            type="button"
+            onClick={onOpenChangePassword}
+            title="Change Password"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 text-xs font-medium transition-colors border border-transparent hover:border-slate-200"
+          >
+            <Key className="w-3.5 h-3.5 text-slate-500" />
+            <span className="hidden sm:inline">Password</span>
+          </button>
+        )}
 
         {/* Role Chip */}
         <div className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">

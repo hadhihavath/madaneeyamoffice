@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+import bcrypt from "bcryptjs";
+
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -26,12 +28,15 @@ export async function GET() {
     return NextResponse.json({ user: null }, { status: 401 });
   }
 
+  const isDefaultPassword = await bcrypt.compare("Password123!", user.passwordHash);
+
   return NextResponse.json({
     user: {
       id: user.id,
       email: user.email,
       role: user.role,
       status: user.status,
+      isDefaultPassword,
       employee: user.employee,
     },
   });

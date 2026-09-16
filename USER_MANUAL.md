@@ -27,8 +27,16 @@
    https://your-domain.com/login
    ```
 3. Enter your official **Work Email Address** (e.g. `yourname@ceem.edu` or your registered email).
-4. Enter your **Password**.
+4. Enter your **Password** (initial default password is `Password123!`).
 5. Click **"Sign In to Workspace"**.
+
+### 🔒 Mandatory First-Time Password Change
+* When you log in for the first time with the default temporary password (`Password123!`), the system will automatically display the **"Set Your Personal Password"** prompt.
+* You must enter your current temporary password and choose a new private password (minimum 8 characters).
+* Once saved, your account is immediately secured, and all subsequent logins must use your new password.
+
+### 🔑 Changing Your Password Anytime
+* You can change your password at any point by clicking the **"Password"** key icon located in the top-right header next to your role badge.
 
 ### Security Guidelines
 * **Keep your credentials confidential**: Never share your login details with colleagues or third parties.
