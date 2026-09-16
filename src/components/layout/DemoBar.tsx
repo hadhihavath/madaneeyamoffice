@@ -13,36 +13,12 @@ export function DemoBar({ currentEmail, onPersonaSwitched }: DemoBarProps) {
 
   const personas = [
     {
-      name: "Dr. Havath (Super Admin)",
-      email: "admin@ceem.edu",
+      name: "Hadi Havath (Super Admin)",
+      email: "hadihavath921@gmail.com",
       role: "SUPER_ADMIN",
       icon: Shield,
       color: "bg-purple-100 text-purple-800 border-purple-300",
       activeColor: "bg-purple-700 text-white shadow-sm",
-    },
-    {
-      name: "Fatima (HR Manager)",
-      email: "hr@ceem.edu",
-      role: "HR",
-      icon: Users,
-      color: "bg-blue-100 text-blue-800 border-blue-300",
-      activeColor: "bg-blue-700 text-white shadow-sm",
-    },
-    {
-      name: "Tariq (Kozhikode Mgr)",
-      email: "kozhikode.manager@ceem.edu",
-      role: "OFFICE_MANAGER",
-      icon: Briefcase,
-      color: "bg-amber-100 text-amber-800 border-amber-300",
-      activeColor: "bg-amber-700 text-white shadow-sm",
-    },
-    {
-      name: "Ahmed (Platform Dev)",
-      email: "ahmed.employee@ceem.edu",
-      role: "EMPLOYEE",
-      icon: User,
-      color: "bg-brand-100 text-brand-800 border-brand-300",
-      activeColor: "bg-brand-600 text-white shadow-sm",
     },
   ];
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { AppShell } from "@/components/layout/AppShell";
 import { OfficeMap } from "@/components/map/OfficeMap";
 import {
@@ -14,12 +15,16 @@ import {
   CheckCircle2,
   Phone,
   Mail,
+  Layers,
 } from "lucide-react";
+
+import { GoogleMapsLocationPicker } from "@/components/map/GoogleMapsLocationPicker";
 
 export default function OfficesPage() {
   const [session, setSession] = useState<any>(null);
   const [offices, setOffices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mapViewMode, setMapViewMode] = useState<"OVERVIEW" | "GEOFENCE_MAP">("OVERVIEW");
 
   // Edit Radius Modal
   const [editOffice, setEditOffice] = useState<any | null>(null);
@@ -126,10 +131,10 @@ export default function OfficesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              Multi-Office Network & Geofences
+              Calicut Headquarters &amp; Geofence
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Configure office branches, GPS geofence radiuses, and location tracking boundaries
+              Configure office location on Google Maps, GPS coordinates, and attendance perimeter
             </p>
           </div>
 
@@ -139,13 +144,20 @@ export default function OfficesPage() {
               className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 self-start sm:self-auto"
             >
               <Plus className="w-4 h-4" />
-              <span>Add New Office Branch</span>
+              <span>Add Branch Office</span>
             </button>
           )}
         </div>
 
-        {/* Interactive Geolocation Map */}
-        {offices.length > 0 && <OfficeMap offices={offices} />}
+        {/* Google Maps Location & Geofence Picker */}
+        {offices.length > 0 && (
+          <div className="space-y-3">
+            <GoogleMapsLocationPicker
+              office={offices[0]}
+              onSaveSuccess={fetchOffices}
+            />
+          </div>
+        )}
 
         {/* Office Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -260,21 +272,36 @@ export default function OfficesPage() {
                   Changing the radius triggers an immutable audit log and alters attendance boundary validation immediately.
                 </div>
 
-                <div className="flex items-center justify-end gap-2 mt-6">
+                <div className="flex items-center justify-between mt-6">
                   <button
                     type="button"
-                    onClick={() => setEditOffice(null)}
-                    className="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 hover:bg-slate-100"
+                    onClick={() => {
+                      setEditOffice(null);
+                      setMapViewMode("GEOFENCE_MAP");
+                      window.scrollTo({ top: 120, behavior: "smooth" });
+                    }}
+                    className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
                   >
-                    Cancel
+                    <MapPin className="w-3.5 h-3.5" />
+                    Open in Map Editor
                   </button>
-                  <button
-                    type="submit"
-                    disabled={editLoading}
-                    className="px-4 py-2 text-xs font-bold rounded-xl bg-brand-600 hover:bg-brand-700 text-white shadow-xs disabled:opacity-50"
-                  >
-                    {editLoading ? "Saving..." : "Save Geofence Radius"}
-                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditOffice(null)}
+                      className="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 hover:bg-slate-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={editLoading}
+                      className="px-4 py-2 text-xs font-bold rounded-xl bg-brand-600 hover:bg-brand-700 text-white shadow-xs disabled:opacity-50"
+                    >
+                      {editLoading ? "Saving..." : "Save Geofence Radius"}
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

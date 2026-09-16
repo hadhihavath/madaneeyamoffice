@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { AppShell } from "@/components/layout/AppShell";
 import {
   Settings as SettingsIcon,
@@ -11,7 +12,10 @@ import {
   Clock,
   Save,
   CheckCircle2,
+  MapPin,
 } from "lucide-react";
+
+import { GoogleMapsLocationPicker } from "@/components/map/GoogleMapsLocationPicker";
 
 export default function SettingsPage() {
   const [orgData, setOrgData] = useState<any | null>(null);
@@ -131,59 +135,15 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Attendance Geofence Configuration per Office */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-soft space-y-4">
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-brand-600" />
-                Office Attendance Geofence Radius Matrix
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Set individual meter perimeters. Check-ins outside this distance are rejected by the Haversine calculator.
-              </p>
+          {/* Google Maps Location & Attendance Geofence Configuration */}
+          {orgData?.offices && orgData.offices.length > 0 && (
+            <div className="space-y-2">
+              <GoogleMapsLocationPicker
+                office={orgData.offices[0]}
+                onSaveSuccess={fetchSettings}
+              />
             </div>
-
-            <div className="space-y-3">
-              {orgData?.offices?.map((office: any) => (
-                <div
-                  key={office.id}
-                  className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                >
-                  <div>
-                    <span className="text-xs font-bold text-slate-900">
-                      {office.name}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-mono ml-2">
-                      ({office.code}) • Coords: {office.latitude}, {office.longitude}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold text-slate-600">
-                      Allowed Radius:
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="number"
-                        min="50"
-                        max="500"
-                        step="10"
-                        value={radiuses[office.id] ?? office.attendanceRadius}
-                        onChange={(e) =>
-                          setRadiuses({
-                            ...radiuses,
-                            [office.id]: Number(e.target.value),
-                          })
-                        }
-                        className="w-20 text-xs p-1.5 rounded-lg border border-slate-200 font-mono font-bold text-brand-800 text-center bg-white"
-                      />
-                      <span className="text-xs font-semibold text-slate-500">meters</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Work Hours & Policies */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-soft space-y-4">

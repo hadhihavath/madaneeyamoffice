@@ -27,12 +27,12 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [summaryStats, setSummaryStats] = useState({
-    totalEmployees: 11,
-    presentToday: 5,
-    onLeave: 1,
+    totalEmployees: 1,
+    presentToday: 0,
+    onLeave: 0,
     absent: 0,
-    lateToday: 1,
-    activeOffices: 5,
+    lateToday: 0,
+    activeOffices: 1,
   });
 
   const loadData = async () => {

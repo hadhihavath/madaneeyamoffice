@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start -p 3000",
     "lint": "next lint",
     "db:push": "prisma db push",
@@ -13,10 +14,15 @@
   },
   "dependencies": {
     "@prisma/client": "^5.21.1",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "@types/leaflet": "^1.9.22",
     "bcryptjs": "^2.4.3",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
+    "firebase": "^12.19.0",
     "jsonwebtoken": "^9.0.2",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.453.0",
     "next": "^14.2.15",
     "react": "^18.3.1",

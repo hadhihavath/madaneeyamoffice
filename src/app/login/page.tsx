@@ -7,7 +7,7 @@ import { Lock, Mail, ArrowRight, Shield, CheckCircle2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@ceem.edu");
+  const [email, setEmail] = useState("hadihavath921@gmail.com");
   const [password, setPassword] = useState("Password123!");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -174,64 +174,31 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Demo Access Bar */}
+          {/* Quick Admin Access Bar */}
           <div className="mt-8 pt-6 border-t border-slate-100">
             <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2 text-center">
-              Quick 1-Click Demo Personas
+              1-Click Super Admin Access
             </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("admin@ceem.edu")}
-                className="p-2 text-left bg-slate-50 hover:bg-purple-50 hover:border-purple-200 border border-slate-200 rounded-lg transition-colors group"
-              >
-                <span className="text-[11px] font-bold text-slate-800 group-hover:text-purple-800 block truncate">
-                  Dr. Havath
-                </span>
-                <span className="text-[10px] text-purple-700 font-semibold block">
-                  Super Admin
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("hr@ceem.edu")}
-                className="p-2 text-left bg-slate-50 hover:bg-blue-50 hover:border-blue-200 border border-slate-200 rounded-lg transition-colors group"
-              >
-                <span className="text-[11px] font-bold text-slate-800 group-hover:text-blue-800 block truncate">
-                  Fatima Zahra
-                </span>
-                <span className="text-[10px] text-blue-700 font-semibold block">
-                  HR Manager
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("kozhikode.manager@ceem.edu")}
-                className="p-2 text-left bg-slate-50 hover:bg-amber-50 hover:border-amber-200 border border-slate-200 rounded-lg transition-colors group"
-              >
-                <span className="text-[11px] font-bold text-slate-800 group-hover:text-amber-800 block truncate">
-                  Tariq Al-Mansoor
-                </span>
-                <span className="text-[10px] text-amber-700 font-semibold block">
-                  Kozhikode Mgr
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("ahmed.employee@ceem.edu")}
-                className="p-2 text-left bg-slate-50 hover:bg-brand-50 hover:border-brand-200 border border-slate-200 rounded-lg transition-colors group"
-              >
-                <span className="text-[11px] font-bold text-slate-800 group-hover:text-brand-800 block truncate">
-                  Ahmed Farooqui
-                </span>
-                <span className="text-[10px] text-brand-700 font-semibold block">
-                  Employee (Dev)
-                </span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => handleQuickDemo("hadihavath921@gmail.com")}
+              className="w-full p-2.5 text-left bg-purple-50/70 hover:bg-purple-100/80 hover:border-purple-300 border border-purple-200 rounded-xl transition-all flex items-center justify-between group shadow-xs"
+            >
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-purple-700" />
+                <div>
+                  <span className="text-xs font-bold text-slate-900 group-hover:text-purple-900 block">
+                    Hadi Havath
+                  </span>
+                  <span className="text-[10px] text-purple-700 font-semibold block">
+                    hadihavath921@gmail.com
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900">
+                Super Admin
+              </span>
+            </button>
           </div>
         </div>
       </div>
