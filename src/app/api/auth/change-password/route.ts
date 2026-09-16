@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, signToken, AUTH_COOKIE } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/lib/audit";
 
@@ -74,10 +74,33 @@ export async function POST(req: NextRequest) {
       details: "User successfully updated their account password.",
     });
 
-    return NextResponse.json({
+    const updatedToken = signToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      employeeId: session.employeeId,
+      officeId: session.officeId,
+      departmentId: session.departmentId,
+      name: session.name,
+      isDefaultPassword: false,
+    });
+
+    const response = NextResponse.json({
       success: true,
       message: "Password changed successfully! You can now use your new password.",
     });
+
+    response.cookies.set({
+      name: AUTH_COOKIE,
+      value: updatedToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
     console.error("Change password error:", error);
     return NextResponse.json(

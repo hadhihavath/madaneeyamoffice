@@ -25,6 +25,7 @@ export interface TokenPayload {
   officeId?: string;
   departmentId?: string;
   name: string;
+  isDefaultPassword?: boolean;
 }
 
 export function signToken(payload: TokenPayload): string {
@@ -86,6 +87,7 @@ export async function getSessionUser(): Promise<(TokenPayload & { avatarUrl?: st
     departmentId: user.employee?.departmentId,
     name: user.employee ? `${user.employee.firstName} ${user.employee.lastName}` : user.email,
     avatarUrl: user.employee?.avatarUrl,
+    isDefaultPassword: payload.isDefaultPassword,
   };
 }
 

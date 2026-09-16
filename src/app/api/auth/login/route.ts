@@ -58,6 +58,8 @@ export async function POST(req: NextRequest) {
       ? `${user.employee.firstName} ${user.employee.lastName}`
       : user.email;
 
+    const isDefaultPassword = password === "Password123!";
+
     const token = signToken({
       userId: user.id,
       email: user.email,
@@ -66,6 +68,7 @@ export async function POST(req: NextRequest) {
       officeId: user.employee?.officeId,
       departmentId: user.employee?.departmentId,
       name,
+      isDefaultPassword,
     });
 
     const response = NextResponse.json({
@@ -75,6 +78,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         role: user.role,
         name,
+        isDefaultPassword,
         employee: user.employee,
       },
     });

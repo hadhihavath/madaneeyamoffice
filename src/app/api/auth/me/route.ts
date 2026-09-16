@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import bcrypt from "bcryptjs";
-
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -14,11 +12,15 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    include: {
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      status: true,
       employee: {
         include: {
-          office: true,
-          department: true,
+          office: { select: { id: true, name: true, code: true } },
+          department: { select: { id: true, name: true, code: true } },
         },
       },
     },
@@ -28,15 +30,13 @@ export async function GET() {
     return NextResponse.json({ user: null }, { status: 401 });
   }
 
-  const isDefaultPassword = await bcrypt.compare("Password123!", user.passwordHash);
-
   return NextResponse.json({
     user: {
       id: user.id,
       email: user.email,
       role: user.role,
       status: user.status,
-      isDefaultPassword,
+      isDefaultPassword: Boolean(session.isDefaultPassword),
       employee: user.employee,
     },
   });

@@ -9,10 +9,13 @@ import { MobileNav } from "./MobileNav";
 import { X, ShieldAlert } from "lucide-react";
 import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
 
+// Global in-memory cache to enable instant zero-lag tab transitions
+let cachedUserSession: any = null;
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(cachedUserSession);
+  const [loading, setLoading] = useState(!cachedUserSession);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
@@ -21,17 +24,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       const res = await fetch("/api/auth/me");
       if (res.ok) {
         const data = await res.json();
+        cachedUserSession = data.user;
         setUser(data.user);
         // Automatically prompt users logging in with default password
         if (data.user?.isDefaultPassword) {
           setChangePasswordOpen(true);
         }
       } else {
+        cachedUserSession = null;
         router.push("/login");
       }
     } catch (err) {
       console.error(err);
-      router.push("/login");
+      if (!cachedUserSession) {
+        router.push("/login");
+      }
     } finally {
       setLoading(false);
     }
@@ -43,6 +50,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const handleLogout = async () => {
     try {
+      cachedUserSession = null;
       await fetch("/api/auth/logout", { method: "POST" });
       router.push("/login");
     } catch (err) {
