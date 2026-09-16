@@ -112,7 +112,7 @@ async function main() {
 
   // 4. Single Super Admin User: hadihavath921@gmail.com
   const adminEmail = "hadihavath921@gmail.com";
-  const passwordHash = await bcrypt.hash("Password123!", 10);
+  const passwordHash = await bcrypt.hash("Adminhadi100", 10);
 
   const adminUser = await prisma.user.create({
     data: {
